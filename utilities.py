@@ -26,8 +26,11 @@ def clean_alias(word):
     else:
         return word.strip()
 
-def filtering_concept(data):
-    new_concept = list()
+def max_concept_length(concept):
+    return max([len(c.split()) for c in concept.split(',')])
+
+def filtering_concept(data):    
+    new_concept = dict()
     for i in range(1, len(data)):
         d = data[i].split('\t')
         concept, alias = d[0], d[1]
@@ -39,5 +42,7 @@ def filtering_concept(data):
             concept = clean_concept(concept)
         concept = [c.lower().strip() for c in concept.split(',')]
         concept = ','.join(list(set(concept)))        
-        new_concept.append(concept)
+        new_concept[concept] = max_concept_length(concept)
+    new_concept = dict(sorted(new_concept.items(), key=lambda item: item[1], reverse=True))
+    new_concept = list(new_concept.keys())
     return new_concept

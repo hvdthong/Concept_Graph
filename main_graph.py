@@ -20,7 +20,7 @@ if __name__ == '__main__':
     params = read_args().parse_args()
     
     if params.concept != None:
-        concepts = read_file(params.concept)
+        concepts = read_file(params.concept)        
         concepts = filtering_concept(data=concepts)
     else:
         print('Please give the directory of the list of concepts')

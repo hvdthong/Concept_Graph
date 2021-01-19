@@ -9,56 +9,91 @@ def regular_expression_for_concept(concept, text):
 
 def match_each_concept_with_each_course_title(concept, title):
     concept = [con.strip() for con in concept.split(',')]
+    flag = False
     for con in concept:
         match_freq = regular_expression_for_concept(concept=con, text=title)[1]
         if match_freq > 0:
-            return True
-    return False
+            flag = True
+            title = title.replace(con, '').strip()
+    if flag:
+        return True, title
+    return False, title
 
 def concepts_courses_matching_title(concepts, courses):
     matching_course = dict()
     print('Matching concepts with the course title')
     for course in tqdm(courses):
         matching_course[course['course_title']] = {}
+        title = course['course_title'].lower()
         for concept in concepts:
-            if match_each_concept_with_each_course_title(concept, course['course_title']):
+            matching, update_title = match_each_concept_with_each_course_title(concept, title)            
+            title = update_title
+            if matching:                
                 matching_course[course['course_title']][concept] = True
             else:
-                matching_course[course['course_title']][concept] = False
+                matching_course[course['course_title']][concept] = False    
     return matching_course
 
 def extract_concept_in_section_heading(concept, sections):
     # Section heading = Section title 
     freq = 0
+    update_sections = list()
     for sec in sections:
-        freq += regular_expression_for_concept(concept=concept, text=sec)[1]
-    return freq
+        if regular_expression_for_concept(concept=concept, text=sec)[1] > 0:            
+            freq += regular_expression_for_concept(concept=concept, text=sec)[1]
+            update_sections.append(sec.lower().replace(concept, '').strip())
+        else:
+            update_sections.append(sec)
+    return freq, update_sections
 
 def extract_concept_in_section_description(concept, sections_desc):
     freq = 0
+    update_secs_desc = list()
     for sec in sections_desc:
         lecs_title = sec['title']
         lecs_description = sec['description']
-        freq += extract_concept_in_section_heading(concept=concept, sections=lecs_title)
-        freq += extract_concept_in_section_heading(concept=concept, sections=lecs_description)
-    return freq
+
+        freq_title, update_lecs_title = extract_concept_in_section_heading(concept=concept, sections=lecs_title)
+        freq_desc, update_lecs_desc = extract_concept_in_section_heading(concept=concept, sections=lecs_description)
+
+        update_sec = dict()
+        update_sec['title'] = update_lecs_title
+        update_sec['description'] = update_lecs_desc
+        update_secs_desc.append(update_sec)
+
+        freq += freq_title
+        freq += freq_desc
+    return freq, update_secs_desc
 
 def match_each_concept_with_course_sections(concept, sections_headline, sections_desc):
     # Note that one course may have multiple sections
     concept = [con.strip() for con in concept.split(',')]
+    flag = False
     for con in concept:
-        if extract_concept_in_section_heading(concept=con, sections=sections_headline) > 0 or extract_concept_in_section_description(concept=con, sections_desc=sections_desc) > 0:
-            return True
-    return False    
+        freq_sec_heading, update_secs_headline = extract_concept_in_section_heading(concept=con, sections=sections_headline)
+        freq_sec_desc, update_secs_desc = extract_concept_in_section_description(concept=con, sections_desc=sections_desc)
+        if freq_sec_heading > 0:
+            flag = True
+            sections_headline = update_secs_headline
+        if freq_sec_desc > 0:
+            flag = True
+            sections_desc = update_secs_desc
+    if flag == True:
+        return True, sections_headline, sections_desc
+    return False, sections_headline, sections_desc    
 
 def concepts_courses_matching_sections(concepts, courses):
     matching_course = dict()
     print('Matching concepts with the multiple sections of the course')
     for course in tqdm(courses):
         matching_course[course['course_title']] = {}
+        sections_headline, sections_desc = course['sections'], course['sections_desc']
         for concept in concepts:
-            if match_each_concept_with_course_sections(concept, course['sections'], course['sections_desc']):
+            matching, update_secs_headline, update_secs_desc = match_each_concept_with_course_sections(concept, sections_headline, sections_desc)
+            if matching:                
                 matching_course[course['course_title']][concept] = True
+                sections_headline = update_secs_headline
+                sections_desc = update_secs_desc
             else:
                 matching_course[course['course_title']][concept] = False
     return matching_course
@@ -83,25 +118,55 @@ def edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, m
 
 def match_concept_with_course_each_section(concept, section_headline, section_desc):
     concept = [con.strip() for con in concept.split(',')]
-    for con in concept:
+    flag = False
+    lecs_title, lecs_desc = section_desc['title'], section_desc['description']
+    for con in concept:        
         freq_title = regular_expression_for_concept(con, section_headline)[1]
-        freq_lecs_title = extract_concept_in_section_heading(con, section_desc['title'])
-        freq_lecs_desc = extract_concept_in_section_heading(con, section_desc['description'])
-        if freq_title > 0 or freq_lecs_title > 0 or freq_lecs_desc > 0:
-            return True
-    return False
+        freq_lecs_title, update_lecs_title = extract_concept_in_section_heading(con, lecs_title)
+        freq_lecs_desc, update_lecs_desc = extract_concept_in_section_heading(con, lecs_desc)
+        if freq_title > 0:
+            flag = True
+            section_headline = section_headline.lower().replace(con, '').strip()
+        if freq_lecs_title > 0:
+            flag = True
+            lecs_title = update_lecs_title
+        if freq_lecs_desc > 0:
+            flag = True
+            lecs_desc = update_lecs_desc
+
+    if flag:
+        new_section_desc = dict()
+        new_section_desc['title'], new_section_desc['description'] = lecs_title, lecs_desc
+        return True, section_headline, new_section_desc
+    return False, section_headline, section_desc
 
 def concepts_courses_matching_each_sections(concepts, courses):
     matching_course = dict()
     print('Matching concepts with the description in the section')
     for course in tqdm(courses):
         matching_course[course['course_title']] = {}
-        for concept in concepts:
-            match_sections = list()
-            for i in range(len(course['sections'])):
-                if match_concept_with_course_each_section(concept, course['sections'][i], course['sections_desc'][i]):
-                    match_sections.append(i)
-            matching_course[course['course_title']][concept] = match_sections
+        # for concept in concepts:
+        #     match_sections = list()
+        #     for i in range(len(course['sections'])):
+        #         if match_concept_with_course_each_section(concept, course['sections'][i], course['sections_desc'][i]):
+        #             match_sections.append(i)
+        #     matching_course[course['course_title']][concept] = match_sections
+        
+        for i in range(len(course['sections'])):
+            sec_headline = course['sections'][i]
+            sec_desc = course['sections_desc'][i]
+            for concept in concepts:
+                matching, update_sec_headline, update_sec_desc = match_concept_with_course_each_section(concept, sec_headline, sec_desc)
+                if matching: 
+                    if concept not in matching_course[course['course_title']].keys():
+                        matching_course[course['course_title']][concept] = [i]
+                    else:
+                        matching_course[course['course_title']][concept].append(i)
+
+                    sec_headline = update_sec_headline
+                    sec_desc = update_sec_desc
+                else:
+                    matching_course[course['course_title']][concept] = []
     return matching_course
 
 def edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections, matching_each_section):
