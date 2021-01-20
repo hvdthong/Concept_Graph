@@ -21,7 +21,7 @@ Please install the neccessary libraries before running our tool:
 
       $ python main_graph.py -concept [path of the concept dictionary] -course [path of the course data] -option order
       
-- To generate the json data for the graph website, please follow this command:
+- To generate the json data for the graph visualization, please follow this command:
       
        $ python main_data.py -edge [path of the edge data constructed by the main_graph.py]
 
