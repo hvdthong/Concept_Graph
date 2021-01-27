@@ -44,6 +44,6 @@ if __name__ == '__main__':
         print('Please give the correct option of the graph: cover or order')
         exit()
     
-    pickle.dump(net_edges, open('edges_' + params.option + '.pickle', 'wb'))        
+    pickle.dump(net_edges, open('edges_' + params.edge.split('.')[-2].replace('/', ''), 'wb'))
     
       
