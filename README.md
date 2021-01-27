@@ -21,6 +21,14 @@ Please install the neccessary libraries before running our tool:
 
       $ python main_graph.py -concept [path of the concept dictionary] -course [path of the course data] -option order
       
+- To generate the tree concept graph, please follow this command:
+
+      $ python main_root_graph.py -concept [name of the concept] -edge [path of the edge data constructed by the main_graph.py]
+      
+- To apply the random walk with restart, please follow this command:
+
+      $ python main_rwr.py -edge [path of the edge data constructed by the main_graph.py]
+      
 - To generate the json data for the graph visualization, please follow this command:
       
        $ python main_data.py -edge [path of the edge data constructed by the main_graph.py]
