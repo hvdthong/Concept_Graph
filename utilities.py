@@ -33,16 +33,23 @@ def filtering_concept(data):
     new_concept = dict()
     for i in range(1, len(data)):
         d = data[i].split('\t')
-        concept, alias = d[0], d[1]
-        if len(alias) > 0:
-            concept = clean_concept(concept) + ',' + clean_alias(alias)
-        elif 'Natural Language Processing' in concept:
-            concept = clean_concept(concept) + ',' + 'NLP'
-        else:
-            concept = clean_concept(concept)
-        concept = [c.lower().strip() for c in concept.split(',')]
-        concept = ','.join(list(set(concept)))        
-        new_concept[concept] = max_concept_length(concept)
+        if len(d) > 1:
+            concept, alias = d[0], d[1]
+            # if i == 5515:
+            #     import pdb; pdb.set_trace()
+            # try:
+            #     print(d, i)
+            # except:
+            #     print("An exception occurred")
+            if len(alias) > 0:
+                concept = clean_concept(concept) + ',' + clean_alias(alias)
+            elif 'Natural Language Processing' in concept:
+                concept = clean_concept(concept) + ',' + 'NLP'
+            else:
+                concept = clean_concept(concept)
+            concept = [c.lower().strip() for c in concept.split(',')]
+            concept = ','.join(list(set(concept)))        
+            new_concept[concept] = max_concept_length(concept)
     new_concept = dict(sorted(new_concept.items(), key=lambda item: item[1], reverse=True))
     new_concept = list(new_concept.keys())
     return new_concept
