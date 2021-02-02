@@ -5,15 +5,14 @@ from extraction import extract_text_in_courses
 from graph_construct import directed_weighted_graph
 from net_graph_construct import net_weight_cover_edges, net_weight_order_edges
 import pickle
+from graph_construct import concepts_courses_matching_title, concepts_courses_matching_sections, concepts_courses_matching_each_sections
 
 def read_args():
     parser = argparse.ArgumentParser()
     
     # Construct the cover or order graph
     parser.add_argument('-concept', type=str, help='Directory of the list of concepts')    
-    parser.add_argument('-course', type=str, help='Directory of the list of courses')
-    parser.add_argument('-option', type=str, default='cover', help='Construct the cover or order graph')
-    parser.add_argument('-threshold', type=float, default=0.1, help='Construct the cover or order graph')
+    parser.add_argument('-course', type=str, help='Directory of the list of courses')    
     return parser
 
 if __name__ == '__main__':
@@ -34,16 +33,14 @@ if __name__ == '__main__':
         print('Please give the directory of the list of courses')
         exit()
 
-    if params.option == 'cover' or params.option == 'order':
-        edges = directed_weighted_graph(concepts, courses, options=params.option)
-        if params.option == 'cover':
-            net_edges = net_weight_cover_edges(edges=edges, threshold=params.threshold)
-        if params.option == 'order':
-            net_edges = net_weight_order_edges(edges=edges, threshold=params.threshold)
-    else:
-        print('Please give the correct option of the graph: cover or order')
-        exit()
-    
-    pickle.dump(net_edges, open('edges_' + params.course.split('.')[-2].replace('/', ''), 'wb'))
+    print('Number of concepts', len(concepts))
+    print('Number of courses', len(courses))
+    matching_title = concepts_courses_matching_title(concepts, courses)
+    pickle.dump(matching_title, open('matching_title_' + params.course.split('.')[-2].replace('/', '') + '.pickle', 'wb'))
+    matching_sections = concepts_courses_matching_sections(concepts, courses)
+    pickle.dump(matching_sections, open('matching_sections_' + params.course.split('.')[-2].replace('/', '') + '.pickle', 'wb'))
+    matching_each_section = concepts_courses_matching_each_sections(concepts, courses)
+    pickle.dump(matching_each_section, open('matching_each_section_' + params.course.split('.')[-2].replace('/', '') + '.pickle', 'wb'))
+    exit()    
     
       

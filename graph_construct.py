@@ -99,16 +99,19 @@ def concepts_courses_matching_sections(concepts, courses):
     return matching_course
 
 def edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections):
-    titles = [c['course_title'] for c in courses]
+    # titles = [c['course_title'] for c in courses]
     root_node_course_title, numerator = 0, 0
 
-    for key in titles:
+    # for key in titles:
+    for key in matching_title.keys():
         if matching_title[key][root_node] == True:
             root_node_course_title += 1
+            if matching_sections[key][dest_node] == True:
+                numerator += 1
 
-    for key in titles:
-        if matching_title[key][root_node] == True and matching_sections[key][dest_node] == True:
-            numerator += 1
+    # for key in titles:
+    #     if matching_title[key][root_node] == True and matching_sections[key][dest_node] == True:
+    #         numerator += 1
 
     if root_node_course_title != 0:
         denominator = max(N_sup, root_node_course_title) + 1
@@ -144,14 +147,7 @@ def concepts_courses_matching_each_sections(concepts, courses):
     matching_course = dict()
     print('Matching concepts with the description in the section')
     for course in tqdm(courses):
-        matching_course[course['course_title']] = {}
-        # for concept in concepts:
-        #     match_sections = list()
-        #     for i in range(len(course['sections'])):
-        #         if match_concept_with_course_each_section(concept, course['sections'][i], course['sections_desc'][i]):
-        #             match_sections.append(i)
-        #     matching_course[course['course_title']][concept] = match_sections
-        
+        matching_course[course['course_title']] = {}       
         for i in range(len(course['sections'])):
             sec_headline = course['sections'][i]
             sec_desc = course['sections_desc'][i]
@@ -206,7 +202,7 @@ def directed_weighted_graph(concepts, courses, options):
                         edge.append(root_node)
                         edge.append(dest_node)
                         edge.append(weight)
-                        edges.append(edge)    
+                        edges.append(edge)  
     if options == 'order':
         matching_sections = concepts_courses_matching_sections(concepts, courses)
         matching_each_section = concepts_courses_matching_each_sections(concepts, courses)
