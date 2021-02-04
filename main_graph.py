@@ -10,15 +10,19 @@ def read_args():
     parser = argparse.ArgumentParser()
     
     # Construct the cover or order graph
-    parser.add_argument('-concept', type=str, help='Directory of the list of concepts')    
-    parser.add_argument('-course', type=str, help='Directory of the list of courses')
+    # parser.add_argument('-concept', type=str, help='Directory of the list of concepts')    
+    # parser.add_argument('-course', type=str, help='Directory of the list of courses')
+    parser.add_argument('-title', type=str, help='The dataset contains matching information of course title')    
+    parser.add_argument('-section', type=str, help='The dataset contains matching information of course section')
     parser.add_argument('-option', type=str, default='cover', help='Construct the cover or order graph')
     parser.add_argument('-threshold', type=float, default=0.1, help='Construct the cover or order graph')
     return parser
 
 if __name__ == '__main__':
     params = read_args().parse_args()
-    
+    name = params.course.split('/')[-1].split('.')[-2]
+    print(name)
+    exit()
     if params.concept != None:
         concepts = read_file(params.concept)        
         concepts = filtering_concept(data=concepts)
