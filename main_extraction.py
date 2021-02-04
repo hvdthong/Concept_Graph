@@ -16,7 +16,7 @@ def read_args():
     return parser
 
 if __name__ == '__main__':
-    params = read_args().parse_args()
+    params = read_args().parse_args()    
     
     if params.concept != None:
         concepts = read_file(params.concept)        
@@ -35,12 +35,13 @@ if __name__ == '__main__':
 
     print('Number of concepts', len(concepts))
     print('Number of courses', len(courses))
+    name = params.course.split('/')[-1].split('.')[-2]
     matching_title = concepts_courses_matching_title(concepts, courses)
-    pickle.dump(matching_title, open('matching_title_' + params.course.split('.')[-2].replace('/', '') + '.pickle', 'wb'))
+    pickle.dump(matching_title, open('matching_title_' + name + '.pickle', 'wb'))    
     matching_sections = concepts_courses_matching_sections(concepts, courses)
-    pickle.dump(matching_sections, open('matching_sections_' + params.course.split('.')[-2].replace('/', '') + '.pickle', 'wb'))
+    pickle.dump(matching_sections, open('matching_sections_' + name + '.pickle', 'wb'))
     matching_each_section = concepts_courses_matching_each_sections(concepts, courses)
-    pickle.dump(matching_each_section, open('matching_each_section_' + params.course.split('.')[-2].replace('/', '') + '.pickle', 'wb'))
-    exit()    
+    pickle.dump(matching_each_section, open('matching_each_section_' + name + '.pickle', 'wb'))
+    
     
       
