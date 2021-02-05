@@ -34,13 +34,7 @@ def filtering_concept(data):
     for i in range(1, len(data)):
         d = data[i].split('\t')
         if len(d) > 1:
-            concept, alias = d[0], d[1]
-            # if i == 5515:
-            #     import pdb; pdb.set_trace()
-            # try:
-            #     print(d, i)
-            # except:
-            #     print("An exception occurred")
+            concept, alias = d[0], d[1]            
             if len(alias) > 0:
                 concept = clean_concept(concept) + ',' + clean_alias(alias)
             elif 'Natural Language Processing' in concept:

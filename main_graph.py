@@ -20,11 +20,34 @@ def read_args():
     return parser
 
 if __name__ == '__main__':
-    params = read_args().parse_args()
-    name = params.course.split('/')[-1].split('.')[-2]
+    params = read_args().parse_args()    
     
     if params.option == 'cover':
-        
+        if params.title != None and params.section != None:
+            matching_title = pickle.load(open(params.title, 'rb'))
+            matching_section = pickle.load(open(params.section, 'rb'))
+            with open('./data_ver2/dev_web_courses_full.json') as json_file:
+                courses = json.load(json_file)
+            courses = extract_text_in_courses(courses=courses)
+            course_titles = list()
+            for c in courses:
+                course_titles.append(c['course_id'])
+            print(len(set(course_titles)))
+            print(len(course_titles))
+            # for k in matching_title.keys():
+            #     print(len(matching_title[k]))
+            # exit()
+            print(len(matching_title))
+            print(len(matching_section))
+            exit()
+        else:
+            print('Please give the matching information of the course title and section')
+            exit()
+    elif params.option == 'order':
+        pass
+    else:
+        print('Please give the correct option of the graph: cover or order')
+        exit()
 
     if params.concept != None:
         concepts = read_file(params.concept)        

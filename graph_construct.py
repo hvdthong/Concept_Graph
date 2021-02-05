@@ -23,15 +23,15 @@ def concepts_courses_matching_title(concepts, courses):
     matching_course = dict()
     print('Matching concepts with the course title')
     for course in tqdm(courses):
-        matching_course[course['course_title']] = {}
+        matching_course[course['course_id']] = {}
         title = course['course_title'].lower()
         for concept in concepts:
             matching, update_title = match_each_concept_with_each_course_title(concept, title)            
             title = update_title
             if matching:                
-                matching_course[course['course_title']][concept] = True
+                matching_course[course['course_id']][concept] = True
             else:
-                matching_course[course['course_title']][concept] = False    
+                matching_course[course['course_id']][concept] = False    
     return matching_course
 
 def extract_concept_in_section_heading(concept, sections):
@@ -86,16 +86,16 @@ def concepts_courses_matching_sections(concepts, courses):
     matching_course = dict()
     print('Matching concepts with the multiple sections of the course')
     for course in tqdm(courses):
-        matching_course[course['course_title']] = {}
+        matching_course[course['course_id']] = {}
         sections_headline, sections_desc = course['sections'], course['sections_desc']
         for concept in concepts:
             matching, update_secs_headline, update_secs_desc = match_each_concept_with_course_sections(concept, sections_headline, sections_desc)
             if matching:                
-                matching_course[course['course_title']][concept] = True
+                matching_course[course['course_id']][concept] = True
                 sections_headline = update_secs_headline
                 sections_desc = update_secs_desc
             else:
-                matching_course[course['course_title']][concept] = False
+                matching_course[course['course_id']][concept] = False
     return matching_course
 
 def edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections):
@@ -147,22 +147,22 @@ def concepts_courses_matching_each_sections(concepts, courses):
     matching_course = dict()
     print('Matching concepts with the description in the section')
     for course in tqdm(courses):
-        matching_course[course['course_title']] = {}       
+        matching_course[course['course_id']] = {}       
         for i in range(len(course['sections'])):
             sec_headline = course['sections'][i]
             sec_desc = course['sections_desc'][i]
             for concept in concepts:
                 matching, update_sec_headline, update_sec_desc = match_concept_with_course_each_section(concept, sec_headline, sec_desc)
                 if matching: 
-                    if concept not in matching_course[course['course_title']].keys():
-                        matching_course[course['course_title']][concept] = [i]
+                    if concept not in matching_course[course['course_id']].keys():
+                        matching_course[course['course_id']][concept] = [i]
                     else:
-                        matching_course[course['course_title']][concept].append(i)
+                        matching_course[course['course_id']][concept].append(i)
 
                     sec_headline = update_sec_headline
                     sec_desc = update_sec_desc
                 else:
-                    matching_course[course['course_title']][concept] = []
+                    matching_course[course['course_id']][concept] = []
     return matching_course
 
 def edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections, matching_each_section):
