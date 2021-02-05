@@ -23,7 +23,8 @@ if __name__ == '__main__':
     params = read_args().parse_args()
     name = params.course.split('/')[-1].split('.')[-2]
     
-    if params.option == 'cover'
+    if params.option == 'cover':
+        
 
     if params.concept != None:
         concepts = read_file(params.concept)        
