@@ -32,7 +32,7 @@ if __name__ == '__main__':
     else:
         print('Please give the directory of the list of courses')
         exit()
-    
+            
     name = params.course.split('/')[-1].split('.')[-2]
     matching_title = concepts_courses_matching_title(concepts, courses)
     pickle.dump(matching_title, open('matching_title_' + name + '.pickle', 'wb'))    

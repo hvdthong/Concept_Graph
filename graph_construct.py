@@ -1,5 +1,6 @@
 import re 
 from tqdm import tqdm
+import pickle
 
 def regular_expression_for_concept(concept, text):
     reg = r'\b' + re.escape(concept) + r's*' + r'\b'
@@ -184,41 +185,139 @@ def edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections
     denominator = max(N_sup, denominator) + 1
     return (numerator + (1 / len(concepts))) / denominator
 
-def directed_weighted_graph(concepts, courses, options):    
-    if options == 'cover':
-        matching_title = concepts_courses_matching_title(concepts, courses)
-        matching_sections = concepts_courses_matching_sections(concepts, courses)
-        N_sup = len([c['course_title'] for c in courses]) / 20
+# def directed_weighted_graph(concepts, courses, options):    
+#     if options == 'cover':
+#         matching_title = concepts_courses_matching_title(concepts, courses)
+#         matching_sections = concepts_courses_matching_sections(concepts, courses)
+#         N_sup = len([c['course_title'] for c in courses]) / 20
 
-        edges = list()
-        for i in range(len(concepts)):
-            root_node = concepts[i]
-            for j in range(len(concepts)):
-                edge = list()
-                dest_node = concepts[j]
-                if root_node != dest_node:
-                    weight = edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections)
-                    if weight > 0:
-                        edge.append(root_node)
-                        edge.append(dest_node)
-                        edge.append(weight)
-                        edges.append(edge)  
-    if options == 'order':
-        matching_sections = concepts_courses_matching_sections(concepts, courses)
-        matching_each_section = concepts_courses_matching_each_sections(concepts, courses)
-        N_sup = len([c['course_title'] for c in courses]) / 20
+#         edges = list()
+#         for i in range(len(concepts)):
+#             root_node = concepts[i]
+#             for j in range(len(concepts)):
+#                 edge = list()
+#                 dest_node = concepts[j]
+#                 if root_node != dest_node:
+#                     weight = edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections)
+#                     if weight > 0:
+#                         edge.append(root_node)
+#                         edge.append(dest_node)
+#                         edge.append(weight)
+#                         edges.append(edge)  
+#     if options == 'order':
+#         matching_sections = concepts_courses_matching_sections(concepts, courses)
+#         matching_each_section = concepts_courses_matching_each_sections(concepts, courses)
+#         N_sup = len([c['course_title'] for c in courses]) / 20
 
-        edges = list()
-        for i in range(len(concepts)):
-            root_node = concepts[i]
-            for j in range(len(concepts)):
+#         edges = list()
+#         for i in range(len(concepts)):
+#             root_node = concepts[i]
+#             for j in range(len(concepts)):
+#                 edge = list()
+#                 dest_node = concepts[j]
+#                 if root_node != dest_node:
+#                     weight = edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections, matching_each_section)
+#                     if weight > 0:
+#                         edge.append(root_node)
+#                         edge.append(dest_node)
+#                         edge.append(weight)
+#                         edges.append(edge)
+#     return edges
+
+def converting_structured_for_title_section(data):
+    courses = data.keys()
+    concepts = list()
+    for k in data.keys():
+        concepts = data[k]
+        break
+
+    new_dict = dict()
+    for concept in concepts:        
+        new_course = list()
+        for course in courses:
+            if data[course][concept] == True:
+                new_course.append(course)
+        new_dict[concept] = new_course
+    return new_dict
+
+def converting_structured_for_each_section(data):
+    filter_data = dict()
+    for k in data.keys():        
+        if len(data[k].keys()) > 0:
+            filter_data[k] = data[k]   
+
+    courses = filter_data.keys()
+    concepts = list()
+    for k in courses:
+        concepts = filter_data[k]
+        break    
+
+    new_dict = dict()
+    for concept in concepts:        
+        new_course = dict()
+        for course in courses:
+            if len(filter_data[course][concept]) > 0:
+                new_course[course] = filter_data[course][concept]
+        if len(new_course) > 0:
+            new_dict[concept] = new_course
+    return new_dict
+
+def directed_weighted_graph(params):
+    edges = list()
+    if params.option == 'cover':
+        matching_title = pickle.load(open(params.title, 'rb'))
+        matching_section = pickle.load(open(params.section, 'rb'))
+        
+        N_sup = len(matching_title.keys()) / 20
+        matching_title = converting_structured_for_title_section(data=matching_title)
+        matching_section = converting_structured_for_title_section(data=matching_section)
+        num_concepts = len(matching_title.keys())
+        
+        for root_node in matching_title.keys():
+            for dest_node in matching_title.keys():
                 edge = list()
-                dest_node = concepts[j]
                 if root_node != dest_node:
-                    weight = edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections, matching_each_section)
-                    if weight > 0:
-                        edge.append(root_node)
-                        edge.append(dest_node)
-                        edge.append(weight)
-                        edges.append(edge)
-    return edges
+                    if len(matching_title[root_node]) > 0 and len(matching_section[dest_node]) > 0:
+                        root_node_course_title = len(matching_title[root_node])                        
+                        numerator = len(list(set(matching_title[root_node]) & set(matching_section[dest_node])))
+                        denominator = max(N_sup, root_node_course_title) + 1
+                        weight = (numerator + (1 / num_concepts)) / denominator
+                        if weight > params.threshold:
+                            edge.append(root_node)
+                            edge.append(dest_node)
+                            edge.append(weight)
+                            edges.append(edge)
+    
+    if params.option == 'order':
+        matching_section = pickle.load(open(params.section, 'rb'))
+        matching_each_section = pickle.load(open(params.lecture, 'rb'))        
+
+        N_sup = len(matching_section.keys()) / 20
+        matching_section = converting_structured_for_title_section(data=matching_section)
+        matching_each_section = converting_structured_for_each_section(data=matching_each_section)
+        num_concepts = len(matching_section.keys())
+        
+        for root_node in matching_each_section.keys():
+            for dest_node in matching_each_section.keys():
+                edge = list()
+                if root_node != dest_node: 
+                    if len(matching_section[root_node]) > 0:
+                        denominator = len(matching_section[root_node]) 
+                        numerator = 0
+                        root_node_course = matching_each_section[root_node].keys()
+                        dest_node_course = matching_each_section[dest_node].keys()
+
+                        intersect_course = list(set(root_node_course) & set(dest_node_course))
+                        if len(intersect_course) > 0:
+                            for course in intersect_course:
+                                if min(matching_each_section[root_node][course]) < max(matching_each_section[dest_node][course]):                                    
+                                    numerator += 1
+                        
+                        denominator = max(N_sup, denominator) + 1
+                        weight = (numerator + (1 / num_concepts)) / denominator
+                        if weight > params.threshold:
+                            edge.append(root_node)
+                            edge.append(dest_node)
+                            edge.append(weight)
+                            edges.append(edge)           
+    return edges                       

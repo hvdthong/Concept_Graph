@@ -41,9 +41,11 @@ def filtering_concept(data):
                 concept = clean_concept(concept) + ',' + 'NLP'
             else:
                 concept = clean_concept(concept)
+
             concept = [c.lower().strip() for c in concept.split(',')]
-            concept = ','.join(list(set(concept)))        
+            concept = ','.join(list(set(concept)))            
             new_concept[concept] = max_concept_length(concept)
+            
     new_concept = dict(sorted(new_concept.items(), key=lambda item: item[1], reverse=True))
     new_concept = list(new_concept.keys())
     return new_concept
