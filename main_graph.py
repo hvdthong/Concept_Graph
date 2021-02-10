@@ -9,9 +9,7 @@ import pickle
 def read_args():
     parser = argparse.ArgumentParser()
     
-    # Construct the cover or order graph
-    # parser.add_argument('-concept', type=str, help='Directory of the list of concepts')    
-    # parser.add_argument('-course', type=str, help='Directory of the list of courses')
+    # Construct the cover or order graph    
     parser.add_argument('-title', type=str, help='The dataset contains matching information of course title')    
     parser.add_argument('-section', type=str, help='The dataset contains matching information of course section')
     parser.add_argument('-lecture', type=str, help='The dataset contains matching information of course lecture')

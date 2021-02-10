@@ -313,11 +313,11 @@ def directed_weighted_graph(params):
                                 if min(matching_each_section[root_node][course]) < max(matching_each_section[dest_node][course]):                                    
                                     numerator += 1
                         
-                        denominator = max(N_sup, denominator) + 1
-                        weight = (numerator + (1 / num_concepts)) / denominator
-                        if weight > params.threshold:
-                            edge.append(root_node)
-                            edge.append(dest_node)
-                            edge.append(weight)
-                            edges.append(edge)           
+                            denominator = max(N_sup, denominator) + 1
+                            weight = (numerator + (1 / num_concepts)) / denominator
+                            if weight > params.threshold:
+                                edge.append(root_node)
+                                edge.append(dest_node)
+                                edge.append(weight)
+                                edges.append(edge)           
     return edges                       
