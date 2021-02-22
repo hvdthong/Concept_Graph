@@ -3,19 +3,25 @@ from tqdm import tqdm
 import pickle
 
 def regular_expression_for_concept(concept, text):
-    reg = r'\b' + re.escape(concept) + r's*' + r'\b'
-    matched = re.findall(reg, text, re.IGNORECASE)
-    matched_count = len(matched)
-    return matched, matched_count
+    reg = r'\b' + re.escape(concept) + r's*' + r'\b'    
+    
+    # matched = re.findall(reg, text, re.IGNORECASE)        
+    # matched_count = len(matched)
+    # return matched, matched_count
+
+    matched = bool(re.search(reg, text, re.IGNORECASE))
+    return matched
 
 def match_each_concept_with_each_course_title(concept, title):
     concept = [con.strip() for con in concept.split(',')]
     flag = False
     for con in concept:
-        match_freq = regular_expression_for_concept(concept=con, text=title)[1]
-        if match_freq > 0:
-            flag = True
-            title = title.replace(con, '').strip()
+        if len(con) > 0:
+            # match_freq = regular_expression_for_concept(concept=con, text=title)[1]
+            # if match_freq > 0:
+            if regular_expression_for_concept(concept=con, text=title) == True:
+                flag = True
+                title = title.replace(con, '').strip()
     if flag:
         return True, title
     return False, title
@@ -40,7 +46,8 @@ def extract_concept_in_section_heading(concept, sections):
     freq = 0
     update_sections = list()
     for sec in sections:
-        if regular_expression_for_concept(concept=concept, text=sec)[1] > 0:            
+        # if regular_expression_for_concept(concept=concept, text=sec)[1] > 0:
+        if regular_expression_for_concept(concept=concept, text=sec) == True:
             freq += regular_expression_for_concept(concept=concept, text=sec)[1]
             update_sections.append(sec.lower().replace(concept, '').strip())
         else:
