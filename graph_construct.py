@@ -10,10 +10,21 @@ def regular_expression_for_concept(concept, text):
     # return matched, matched_count
 
     matched = bool(re.search(reg, text, re.IGNORECASE))
+    if matched == True: 
+        import pdb; pdb.set_trace()
     return matched
 
+def filtering_concept(concept):
+    concept = concept.split(',')
+    new_concept = list()
+    for con in concept:
+        if len(con.strip()) > 0:
+            new_concept.append(con.strip())
+    return new_concept
+
 def match_each_concept_with_each_course_title(concept, title):
-    concept = [con.strip() for con in concept.split(',')]
+    # concept = [con.strip() for con in concept.split(',')]
+    concept = filtering_concept(concept)
     flag = False
     for con in concept:
         if len(con) > 0:
