@@ -1,17 +1,19 @@
 import re 
 from tqdm import tqdm
 import pickle
+from functools import partial
+from functools import partial
+from multiprocessing import Pool
 
 def regular_expression_for_concept(concept, text):
+    concept = '|'.join(concept).strip()
     reg = r'\b' + re.escape(concept) + r's*' + r'\b'    
     
     # matched = re.findall(reg, text, re.IGNORECASE)        
     # matched_count = len(matched)
-    # return matched, matched_count
+    # return matched, matched_count    
 
-    matched = bool(re.search(reg, text, re.IGNORECASE))
-    if matched == True: 
-        import pdb; pdb.set_trace()
+    matched = bool(re.search(reg, text, re.IGNORECASE))    
     return matched
 
 def filtering_concept(concept):
@@ -25,32 +27,66 @@ def filtering_concept(concept):
 def match_each_concept_with_each_course_title(concept, title):
     # concept = [con.strip() for con in concept.split(',')]
     concept = filtering_concept(concept)
-    flag = False
-    for con in concept:
-        if len(con) > 0:
-            # match_freq = regular_expression_for_concept(concept=con, text=title)[1]
-            # if match_freq > 0:
-            if regular_expression_for_concept(concept=con, text=title) == True:
-                flag = True
-                title = title.replace(con, '').strip()
-    if flag:
+        
+    if regular_expression_for_concept(concept=concept, text=title) == True:        
+        if len(concept) > 1:
+            import pdb; pdb.set_trace()
+        title = re.sub(r'|'.join(map(re.escape, concept)), '', title).strip()
         return True, title
-    return False, title
+    else:
+        return False, title
+    
+    # flag = False
+    # for con in concept:
+    #     if len(con) > 0:
+    #         # match_freq = regular_expression_for_concept(concept=con, text=title)[1]
+    #         # if match_freq > 0:
+    #         if regular_expression_for_concept(concept=con, text=title) == True:
+    #             flag = True
+    #             title = title.replace(con, '').strip()
+    # if flag:
+    #     return True, title
+    # return False, title
 
-def concepts_courses_matching_title(concepts, courses):
+def multiprocessing_title(course, concepts):
     matching_course = dict()
-    print('Matching concepts with the course title')
-    for course in tqdm(courses):
-        matching_course[course['course_id']] = {}
-        title = course['course_title'].lower()
-        for concept in concepts:
-            matching, update_title = match_each_concept_with_each_course_title(concept, title)            
-            title = update_title
-            if matching:                
-                matching_course[course['course_id']][concept] = True
-            else:
-                matching_course[course['course_id']][concept] = False    
+    matching_course[course['course_id']] = {}
+    title = course['course_title'].lower()
+    title = course['course_title'].lower()
+
+    for concept in concepts:
+        matching, update_title = match_each_concept_with_each_course_title(concept, title)            
+        title = update_title
+        if matching:                
+            matching_course[course['course_id']][concept] = True
+        else:
+            matching_course[course['course_id']][concept] = False   
     return matching_course
+
+def concepts_courses_matching_title(concepts, courses, params):
+    # matching_course = dict()
+    # print('Matching concepts with the course title')
+
+    # for course in tqdm(courses):
+    #     matching_course[course['course_id']] = {}
+    #     title = course['course_title'].lower()
+    #     for concept in concepts:
+    #         matching, update_title = match_each_concept_with_each_course_title(concept, title)            
+    #         title = update_title
+    #         if matching:                
+    #             matching_course[course['course_id']][concept] = True
+    #         else:
+    #             matching_course[course['course_id']][concept] = False    
+    # return matching_course
+
+    print('Matching concepts with the course title')
+    pool = Pool(processes=params.p)
+    results = pool.map(partial(multiprocessing_title, concepts=concepts), tqdm(courses))
+    pool.close()
+    new_results = {}
+    for r in results:
+        new_results.update(r)
+    return new_results
 
 def extract_concept_in_section_heading(concept, sections):
     # Section heading = Section title 
@@ -86,27 +122,35 @@ def extract_concept_in_section_description(concept, sections_desc):
 
 def match_each_concept_with_course_sections(concept, sections_headline, sections_desc):
     # Note that one course may have multiple sections
-    concept = [con.strip() for con in concept.split(',')]
-    flag = False
-    for con in concept:
-        freq_sec_heading, update_secs_headline = extract_concept_in_section_heading(concept=con, sections=sections_headline)
-        freq_sec_desc, update_secs_desc = extract_concept_in_section_description(concept=con, sections_desc=sections_desc)
-        if freq_sec_heading > 0:
-            flag = True
-            sections_headline = update_secs_headline
-        if freq_sec_desc > 0:
-            flag = True
-            sections_desc = update_secs_desc
-    if flag == True:
-        return True, sections_headline, sections_desc
-    return False, sections_headline, sections_desc    
+    
+    # concept = [con.strip() for con in concept.split(',')]
+    concept = filtering_concept(concept)
+    freq_sec_heading, update_secs_headline = extract_concept_in_section_heading(concept=concept, sections=sections_headline)
+    freq_sec_desc, update_secs_desc = extract_concept_in_section_description(concept=concept, sections_desc=sections_desc)
+    return None
+    
+    # flag = False
+    # for con in concept:
+    #     freq_sec_heading, update_secs_headline = extract_concept_in_section_heading(concept=con, sections=sections_headline)
+    #     freq_sec_desc, update_secs_desc = extract_concept_in_section_description(concept=con, sections_desc=sections_desc)
+    #     if freq_sec_heading > 0:
+    #         flag = True
+    #         sections_headline = update_secs_headline
+    #     if freq_sec_desc > 0:
+    #         flag = True
+    #         sections_desc = update_secs_desc
+    # if flag == True:
+    #     return True, sections_headline, sections_desc
+    # return False, sections_headline, sections_desc    
 
-def concepts_courses_matching_sections(concepts, courses):
+def concepts_courses_matching_sections(concepts, courses, params):
     matching_course = dict()
     print('Matching concepts with the multiple sections of the course')
     for course in tqdm(courses):
         matching_course[course['course_id']] = {}
         sections_headline, sections_desc = course['sections'], course['sections_desc']
+        import pdb; pdb.set_trace()
+        
         for concept in concepts:
             matching, update_secs_headline, update_secs_desc = match_each_concept_with_course_sections(concept, sections_headline, sections_desc)
             if matching:                
