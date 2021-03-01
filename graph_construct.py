@@ -40,7 +40,7 @@ def multiprocessing_title(course, concepts):
         if matching:                
             matching_course[course['course_id']][concept] = True
         else:
-            matching_course[course['course_id']][concept] = False   
+            matching_course[course['course_id']][concept] = False           
     return matching_course
 
 def concepts_courses_matching_title(concepts, courses, params):
@@ -52,61 +52,6 @@ def concepts_courses_matching_title(concepts, courses, params):
     for r in results:
         new_results.update(r)
     return new_results
-
-def extract_concept_in_section_heading(concept, sections):
-    # Section heading = Section title 
-    freq = 0
-    update_sections = list()
-    for sec in sections:
-        # if regular_expression_for_concept(concept=concept, text=sec)[1] > 0:
-        if regular_expression_for_concept(concept=concept, text=sec) == True:
-            freq += regular_expression_for_concept(concept=concept, text=sec)[1]
-            update_sections.append(sec.lower().replace(concept, '').strip())
-        else:
-            update_sections.append(sec)
-    return freq, update_sections
-
-def extract_concept_in_section_description(concept, sections_desc):
-    freq = 0
-    update_secs_desc = list()
-    for sec in sections_desc:
-        lecs_title = sec['title']
-        lecs_description = sec['description']
-
-        freq_title, update_lecs_title = extract_concept_in_section_heading(concept=concept, sections=lecs_title)
-        freq_desc, update_lecs_desc = extract_concept_in_section_heading(concept=concept, sections=lecs_description)
-
-        update_sec = dict()
-        update_sec['title'] = update_lecs_title
-        update_sec['description'] = update_lecs_desc
-        update_secs_desc.append(update_sec)
-
-        freq += freq_title
-        freq += freq_desc
-    return freq, update_secs_desc
-
-def match_each_concept_with_course_sections(concept, sections_headline, sections_desc):
-    # Note that one course may have multiple sections
-    
-    # concept = [con.strip() for con in concept.split(',')]
-    concept = filtering_concept(concept)
-    freq_sec_heading, update_secs_headline = extract_concept_in_section_heading(concept=concept, sections=sections_headline)
-    freq_sec_desc, update_secs_desc = extract_concept_in_section_description(concept=concept, sections_desc=sections_desc)
-    return None
-    
-    # flag = False
-    # for con in concept:
-    #     freq_sec_heading, update_secs_headline = extract_concept_in_section_heading(concept=con, sections=sections_headline)
-    #     freq_sec_desc, update_secs_desc = extract_concept_in_section_description(concept=con, sections_desc=sections_desc)
-    #     if freq_sec_heading > 0:
-    #         flag = True
-    #         sections_headline = update_secs_headline
-    #     if freq_sec_desc > 0:
-    #         flag = True
-    #         sections_desc = update_secs_desc
-    # if flag == True:
-    #     return True, sections_headline, sections_desc
-    # return False, sections_headline, sections_desc
 
 def extract_text_sections_headline(sections):
     text = ' '.join(sections).strip()
@@ -151,31 +96,6 @@ def concepts_courses_matching_sections(concepts, courses, params):
     return new_results
 
 
-
-def match_concept_with_course_each_section(concept, section_headline, section_desc):
-    concept = [con.strip() for con in concept.split(',')]
-    flag = False
-    lecs_title, lecs_desc = section_desc['title'], section_desc['description']
-    for con in concept:        
-        freq_title = regular_expression_for_concept(con, section_headline)[1]
-        freq_lecs_title, update_lecs_title = extract_concept_in_section_heading(con, lecs_title)
-        freq_lecs_desc, update_lecs_desc = extract_concept_in_section_heading(con, lecs_desc)
-        if freq_title > 0:
-            flag = True
-            section_headline = section_headline.lower().replace(con, '').strip()
-        if freq_lecs_title > 0:
-            flag = True
-            lecs_title = update_lecs_title
-        if freq_lecs_desc > 0:
-            flag = True
-            lecs_desc = update_lecs_desc
-
-    if flag:
-        new_section_desc = dict()
-        new_section_desc['title'], new_section_desc['description'] = lecs_title, lecs_desc
-        return True, section_headline, new_section_desc
-    return False, section_headline, section_desc
-
 def extract_text_each_sections_decs(section_desc):    
     title_text = ' '.join(section_desc['title'])
     desc_text = ' '.join(section_desc['description'])
@@ -212,30 +132,6 @@ def concepts_courses_matching_each_sections(concepts, courses, params):
     for r in results:
         new_results.update(r)
     return new_results
-
-    # matching_course = dict()
-    # print('Matching concepts with the description in the section')
-    # for course in tqdm(courses):
-
-    #     multiprocessing_each_section(course, concepts)
-
-        # matching_course[course['course_id']] = {}       
-        # for i in range(len(course['sections'])):
-        #     sec_headline = course['sections'][i]
-        #     sec_desc = course['sections_desc'][i]
-        #     for concept in concepts:
-        #         matching, update_sec_headline, update_sec_desc = match_concept_with_course_each_section(concept, sec_headline, sec_desc)
-        #         if matching: 
-        #             if concept not in matching_course[course['course_id']].keys():
-        #                 matching_course[course['course_id']][concept] = [i]
-        #             else:
-        #                 matching_course[course['course_id']][concept].append(i)
-
-        #             sec_headline = update_sec_headline
-        #             sec_desc = update_sec_desc
-        #         else:
-        #             matching_course[course['course_id']][concept] = []
-    # return matching_course
 
 def edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections):    
     root_node_course_title, numerator = 0, 0
@@ -299,7 +195,7 @@ def converting_structured_for_each_section(data):
     for k in courses:
         concepts = filter_data[k]
         break    
-
+    
     new_dict = dict()
     for concept in concepts:        
         new_course = dict()
@@ -315,16 +211,18 @@ def directed_weighted_graph(params):
     if params.option == 'cover':
         matching_title = pickle.load(open(params.title, 'rb'))
         matching_section = pickle.load(open(params.section, 'rb'))
+
         
         N_sup = len(matching_title.keys()) / 20
         matching_title = converting_structured_for_title_section(data=matching_title)
         matching_section = converting_structured_for_title_section(data=matching_section)
         num_concepts = len(matching_title.keys())
-        
+
         for root_node in matching_title.keys():
             for dest_node in matching_title.keys():
                 edge = list()
                 if root_node != dest_node:
+
                     if len(matching_title[root_node]) > 0 and len(matching_section[dest_node]) > 0:
                         root_node_course_title = len(matching_title[root_node])                        
                         numerator = len(list(set(matching_title[root_node]) & set(matching_section[dest_node])))
