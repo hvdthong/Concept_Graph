@@ -8,11 +8,6 @@ from multiprocessing import Pool
 def regular_expression_for_concept(concept, text):
     concept = '|'.join(concept).strip()
     reg = r'\b' + re.escape(concept) + r's*' + r'\b'    
-    
-    # matched = re.findall(reg, text, re.IGNORECASE)        
-    # matched_count = len(matched)
-    # return matched, matched_count    
-
     matched = bool(re.search(reg, text, re.IGNORECASE))    
     return matched
 
@@ -25,28 +20,13 @@ def filtering_concept(concept):
     return new_concept
 
 def match_each_concept_with_each_course_title(concept, title):
-    # concept = [con.strip() for con in concept.split(',')]
     concept = filtering_concept(concept)
         
     if regular_expression_for_concept(concept=concept, text=title) == True:        
-        if len(concept) > 1:
-            import pdb; pdb.set_trace()
         title = re.sub(r'|'.join(map(re.escape, concept)), '', title).strip()
         return True, title
     else:
         return False, title
-    
-    # flag = False
-    # for con in concept:
-    #     if len(con) > 0:
-    #         # match_freq = regular_expression_for_concept(concept=con, text=title)[1]
-    #         # if match_freq > 0:
-    #         if regular_expression_for_concept(concept=con, text=title) == True:
-    #             flag = True
-    #             title = title.replace(con, '').strip()
-    # if flag:
-    #     return True, title
-    # return False, title
 
 def multiprocessing_title(course, concepts):
     matching_course = dict()
@@ -64,21 +44,6 @@ def multiprocessing_title(course, concepts):
     return matching_course
 
 def concepts_courses_matching_title(concepts, courses, params):
-    # matching_course = dict()
-    # print('Matching concepts with the course title')
-
-    # for course in tqdm(courses):
-    #     matching_course[course['course_id']] = {}
-    #     title = course['course_title'].lower()
-    #     for concept in concepts:
-    #         matching, update_title = match_each_concept_with_each_course_title(concept, title)            
-    #         title = update_title
-    #         if matching:                
-    #             matching_course[course['course_id']][concept] = True
-    #         else:
-    #             matching_course[course['course_id']][concept] = False    
-    # return matching_course
-
     print('Matching concepts with the course title')
     pool = Pool(processes=params.p)
     results = pool.map(partial(multiprocessing_title, concepts=concepts), tqdm(courses))
@@ -141,46 +106,51 @@ def match_each_concept_with_course_sections(concept, sections_headline, sections
     #         sections_desc = update_secs_desc
     # if flag == True:
     #     return True, sections_headline, sections_desc
-    # return False, sections_headline, sections_desc    
+    # return False, sections_headline, sections_desc
 
-def concepts_courses_matching_sections(concepts, courses, params):
+def extract_text_sections_headline(sections):
+    text = ' '.join(sections).strip()
+    return text.lower()
+
+def extract_text_sections_desc(sections_desc):
+    title_text, desc_text = '', ''
+
+    for sec in sections_desc:        
+        title_text += ' ' + ' '.join(sec['title'])
+        desc_text += ' ' + ' '.join(sec['description'])
+        title_text = title_text.strip()
+        desc_text = desc_text.strip()
+    return (title_text + ' ' + desc_text).lower()
+
+def multiprocessing_section(course, concepts):
     matching_course = dict()
-    print('Matching concepts with the multiple sections of the course')
-    for course in tqdm(courses):
-        matching_course[course['course_id']] = {}
-        sections_headline, sections_desc = course['sections'], course['sections_desc']
-        import pdb; pdb.set_trace()
-        
-        for concept in concepts:
-            matching, update_secs_headline, update_secs_desc = match_each_concept_with_course_sections(concept, sections_headline, sections_desc)
-            if matching:                
-                matching_course[course['course_id']][concept] = True
-                sections_headline = update_secs_headline
-                sections_desc = update_secs_desc
-            else:
-                matching_course[course['course_id']][concept] = False
+    matching_course[course['course_id']] = {}
+    sections_headline, sections_desc = course['sections'], course['sections_desc']
+    sections_headline = extract_text_sections_headline(sections_headline)
+    sections_desc = extract_text_sections_desc(sections_desc)
+    sections_text = sections_headline + sections_desc
+
+    for concept in concepts:
+        matching, update_sections = match_each_concept_with_each_course_title(concept, sections_text)            
+        sections_text = update_sections
+        if matching:                
+            matching_course[course['course_id']][concept] = True
+        else:
+            matching_course[course['course_id']][concept] = False   
     return matching_course
 
-def edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections):
-    # titles = [c['course_title'] for c in courses]
-    root_node_course_title, numerator = 0, 0
 
-    # for key in titles:
-    for key in matching_title.keys():
-        if matching_title[key][root_node] == True:
-            root_node_course_title += 1
-            if matching_sections[key][dest_node] == True:
-                numerator += 1
+def concepts_courses_matching_sections(concepts, courses, params):
+    print('Matching concepts with the multiple sections of the course')
+    pool = Pool(processes=params.p)
+    results = pool.map(partial(multiprocessing_section, concepts=concepts), tqdm(courses))
+    pool.close()
+    new_results = {}
+    for r in results:
+        new_results.update(r)
+    return new_results
 
-    # for key in titles:
-    #     if matching_title[key][root_node] == True and matching_sections[key][dest_node] == True:
-    #         numerator += 1
 
-    if root_node_course_title != 0:
-        denominator = max(N_sup, root_node_course_title) + 1
-        return (numerator + (1 / len(concepts))) / denominator
-    else:
-        return 0
 
 def match_concept_with_course_each_section(concept, section_headline, section_desc):
     concept = [con.strip() for con in concept.split(',')]
@@ -206,27 +176,82 @@ def match_concept_with_course_each_section(concept, section_headline, section_de
         return True, section_headline, new_section_desc
     return False, section_headline, section_desc
 
-def concepts_courses_matching_each_sections(concepts, courses):
-    matching_course = dict()
-    print('Matching concepts with the description in the section')
-    for course in tqdm(courses):
-        matching_course[course['course_id']] = {}       
-        for i in range(len(course['sections'])):
-            sec_headline = course['sections'][i]
-            sec_desc = course['sections_desc'][i]
-            for concept in concepts:
-                matching, update_sec_headline, update_sec_desc = match_concept_with_course_each_section(concept, sec_headline, sec_desc)
-                if matching: 
-                    if concept not in matching_course[course['course_id']].keys():
-                        matching_course[course['course_id']][concept] = [i]
-                    else:
-                        matching_course[course['course_id']][concept].append(i)
+def extract_text_each_sections_decs(section_desc):    
+    title_text = ' '.join(section_desc['title'])
+    desc_text = ' '.join(section_desc['description'])
+    return (title_text + ' ' + desc_text).strip()
 
-                    sec_headline = update_sec_headline
-                    sec_desc = update_sec_desc
+
+def multiprocessing_each_section(course, concepts):
+    matching_course = dict()
+    matching_course[course['course_id']] = {}
+    
+    for i in range(len(course['sections'])):        
+        sec_headline = course['sections'][i]
+        sec_desc = course['sections_desc'][i]
+        sec_text = (sec_headline + ' ' + extract_text_each_sections_decs(sec_desc)).lower()
+
+        for concept in concepts:
+            matching, update_sec_text = match_each_concept_with_each_course_title(concept, sec_text)            
+            sec_text = update_sec_text
+            if matching:                
+                if concept not in matching_course[course['course_id']].keys():
+                    matching_course[course['course_id']][concept] = [i]
                 else:
-                    matching_course[course['course_id']][concept] = []
+                    matching_course[course['course_id']][concept].append(i)
+            else:
+                matching_course[course['course_id']][concept] = []
     return matching_course
+
+def concepts_courses_matching_each_sections(concepts, courses, params):
+    print('Matching concepts with the description in the section')
+    pool = Pool(processes=params.p)
+    results = pool.map(partial(multiprocessing_each_section, concepts=concepts), tqdm(courses))
+    pool.close()
+    new_results = {}
+    for r in results:
+        new_results.update(r)
+    return new_results
+
+    # matching_course = dict()
+    # print('Matching concepts with the description in the section')
+    # for course in tqdm(courses):
+
+    #     multiprocessing_each_section(course, concepts)
+
+        # matching_course[course['course_id']] = {}       
+        # for i in range(len(course['sections'])):
+        #     sec_headline = course['sections'][i]
+        #     sec_desc = course['sections_desc'][i]
+        #     for concept in concepts:
+        #         matching, update_sec_headline, update_sec_desc = match_concept_with_course_each_section(concept, sec_headline, sec_desc)
+        #         if matching: 
+        #             if concept not in matching_course[course['course_id']].keys():
+        #                 matching_course[course['course_id']][concept] = [i]
+        #             else:
+        #                 matching_course[course['course_id']][concept].append(i)
+
+        #             sec_headline = update_sec_headline
+        #             sec_desc = update_sec_desc
+        #         else:
+        #             matching_course[course['course_id']][concept] = []
+    # return matching_course
+
+def edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections):    
+    root_node_course_title, numerator = 0, 0
+
+    # for key in titles:
+    for key in matching_title.keys():
+        if matching_title[key][root_node] == True:
+            root_node_course_title += 1
+            if matching_sections[key][dest_node] == True:
+                numerator += 1
+
+    if root_node_course_title != 0:
+        denominator = max(N_sup, root_node_course_title) + 1
+        return (numerator + (1 / len(concepts))) / denominator
+    else:
+        return 0
 
 def edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections, matching_each_section):
     titles = [c['course_title'] for c in courses]
@@ -246,45 +271,6 @@ def edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections
 
     denominator = max(N_sup, denominator) + 1
     return (numerator + (1 / len(concepts))) / denominator
-
-# def directed_weighted_graph(concepts, courses, options):    
-#     if options == 'cover':
-#         matching_title = concepts_courses_matching_title(concepts, courses)
-#         matching_sections = concepts_courses_matching_sections(concepts, courses)
-#         N_sup = len([c['course_title'] for c in courses]) / 20
-
-#         edges = list()
-#         for i in range(len(concepts)):
-#             root_node = concepts[i]
-#             for j in range(len(concepts)):
-#                 edge = list()
-#                 dest_node = concepts[j]
-#                 if root_node != dest_node:
-#                     weight = edge_cover(root_node, dest_node, courses, N_sup, concepts, matching_title, matching_sections)
-#                     if weight > 0:
-#                         edge.append(root_node)
-#                         edge.append(dest_node)
-#                         edge.append(weight)
-#                         edges.append(edge)  
-#     if options == 'order':
-#         matching_sections = concepts_courses_matching_sections(concepts, courses)
-#         matching_each_section = concepts_courses_matching_each_sections(concepts, courses)
-#         N_sup = len([c['course_title'] for c in courses]) / 20
-
-#         edges = list()
-#         for i in range(len(concepts)):
-#             root_node = concepts[i]
-#             for j in range(len(concepts)):
-#                 edge = list()
-#                 dest_node = concepts[j]
-#                 if root_node != dest_node:
-#                     weight = edge_order(root_node, dest_node, courses, N_sup, concepts, matching_sections, matching_each_section)
-#                     if weight > 0:
-#                         edge.append(root_node)
-#                         edge.append(dest_node)
-#                         edge.append(weight)
-#                         edges.append(edge)
-#     return edges
 
 def converting_structured_for_title_section(data):
     courses = data.keys()

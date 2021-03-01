@@ -38,9 +38,10 @@ if __name__ == '__main__':
     # matching_title = concepts_courses_matching_title(concepts, courses, params)
     # pickle.dump(matching_title, open('matching_title_' + name + '.pickle', 'wb'))    
     # exit()
-    matching_sections = concepts_courses_matching_sections(concepts, courses, params)
-    pickle.dump(matching_sections, open('matching_sections_' + name + '.pickle', 'wb'))
-    matching_each_section = concepts_courses_matching_each_sections(concepts, courses)
+    # matching_sections = concepts_courses_matching_sections(concepts, courses, params)
+    # pickle.dump(matching_sections, open('matching_sections_' + name + '.pickle', 'wb'))
+    # exit()
+    matching_each_section = concepts_courses_matching_each_sections(concepts, courses, params)
     pickle.dump(matching_each_section, open('matching_each_section_' + name + '.pickle', 'wb'))
     
     
