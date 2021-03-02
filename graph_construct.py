@@ -211,7 +211,6 @@ def directed_weighted_graph(params):
     if params.option == 'cover':
         matching_title = pickle.load(open(params.title, 'rb'))
         matching_section = pickle.load(open(params.section, 'rb'))
-
         
         N_sup = len(matching_title.keys()) / 20
         matching_title = converting_structured_for_title_section(data=matching_title)
