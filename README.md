@@ -22,6 +22,9 @@ Please install the neccessary libraries before running our tool:
 - python
 - tqdm
 
+## Main file:
+
+
 ## Hyperparameters:
 
 #### main_extraction.py
@@ -35,6 +38,19 @@ Please install the neccessary libraries before running our tool:
 * -lecture: Directory of the file containing matching information of course lecture
 * -option: Option to generate the cover or order graph (Default: cover)
 * -threshold: Threshold to construct the net graph for the cover and order graph (Default: 0.1)
+
+#### main_root_graph.py
+* -concept: Name of the concept
+* -graph_edge: Directory of the list of edges in the graph
+
+#### main_rwr.py
+* -graph_edge: Directory of the list of edges in the graph
+* -c: Restart probablity (rwr) or jumping probability (otherwise) (Default: 0.15)
+* -epsilon: Error tolerance for power iteration (Default: 1e-9)
+* -max_iters: Maximum number of iterations for power iteration (Default: 100)
+
+#### main_data.py
+* -graph_edge: Directory of the list of edges in the graph
 
 ## Running
       
