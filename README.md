@@ -22,7 +22,14 @@ Please install the neccessary libraries before running our tool:
 - python
 - tqdm
 
-## Main file:
+## Description
+Below is the list of main files used to generate the concept graph (cover or order network):
+
+- main_extraction.py: used to extract the concept information from the title, section, and lecture in the course
+- main_graph.py: used to generate the net cover or order network
+- main_root_graph: used to generate the net cover or order graph based on a root concept
+- main_rwr.py: applied random walk with restart (rwr) for the cover or order network
+- main_data.py: used to convert the cover or order network into JSON format for a visualization purpose
 
 
 ## Hyperparameters:
