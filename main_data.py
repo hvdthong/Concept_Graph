@@ -7,7 +7,7 @@ def read_args():
     parser = argparse.ArgumentParser()
     
     # Construct the json data for the edges 
-    parser.add_argument('-edge', type=str, help='Directory of the list of edges')        
+    parser.add_argument('-graph_edge', type=str, help='Directory of the list of edges in the graph')        
     return parser
 
 if __name__ == '__main__':
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     if params.edge != None:        
         edges = pickle.load(open(params.edge, 'rb'))
     else:
-        print('Please give the directory of the list of edges')
+        print('Please give the directory of the list of edges in the graph')
         exit()
 
     data = {'nodes': json_node(edges=edges), 'links': json_links(edges=edges)}

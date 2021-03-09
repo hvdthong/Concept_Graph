@@ -24,13 +24,13 @@ if __name__ == '__main__':
         if params.title != None and params.section != None:
             edges = directed_weighted_graph(params) 
         else:
-            print('Please give the matching information of the course title and section')
+            print('If you want to generate the cover graph, please give the matching information of the course title and section')
             exit()
     elif params.option == 'order':
         if params.section != None and params.lecture != None:
             edges = directed_weighted_graph(params) 
         else:
-            print('Please give the matching information of the course section and lecture')
+            print('If you want to generate the cover graph, please give the matching information of the course section and lecture')
             exit()
     else:
         print('Please give the correct option of the graph: cover or order')

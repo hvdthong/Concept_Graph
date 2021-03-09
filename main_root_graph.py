@@ -7,7 +7,7 @@ def read_args():
     
     # Construct the cover or order graph
     parser.add_argument('-concept', type=str, help='Name of the concept')    
-    parser.add_argument('-edge', type=str, help='Directory of the list of edges')
+    parser.add_argument('-graph_edge', type=str, help='Directory of the list of edges in the graph')
     return parser
 
 if __name__ == '__main__':
