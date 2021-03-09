@@ -25,12 +25,16 @@ Please install the neccessary libraries before running our tool:
 ## Hyperparameters:
 
 #### main_extraction.py
-* -concept: Directory of the list of concepts.
-* -course: Directory of the list of courses.
-* -p: Number of threads to speed up the pre processing data (default: 2).
+* -concept: Directory of the list of concepts
+* -course: Directory of the list of courses
+* -p: Number of threads to speed up the pre processing data (Default: 2)
 
 #### main_graph.py
-* -threshold: Threshold to construct the net graph for the cover and order graph (default: 0.1). 
+* -title: Directory of the file containing matching information of course title
+* -section: Directory of the file containing matching information of course section
+* -lecture: Directory of the file containing matching information of course lecture
+* -option: Option to generate the cover or order graph (Default: cover)
+* -threshold: Threshold to construct the net graph for the cover and order graph (Default: 0.1)
 
 ## Running
       
