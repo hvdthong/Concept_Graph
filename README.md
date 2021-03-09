@@ -2,7 +2,7 @@
 
 ## Introduction
 
-#### Cover Network
+##### Cover Network
 A cover network <img src="https://render.githubusercontent.com/render/math?math=\mathcal{G}^c"> consists of concept nodes <img src="https://render.githubusercontent.com/render/math?math=\mathcal{P}"> and cover edges <img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}^c \in \mathcal{P} \times \mathcal{P}">.
 
 ## Implementation Environment
