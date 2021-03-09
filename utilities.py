@@ -1,6 +1,6 @@
 def read_file(path):
     data = list()
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for line in f:
             data.append(line.strip())
     return data
