@@ -61,13 +61,15 @@ Below is the list of main files used to generate the concept graph (cover or ord
 
 ## Running
       
-- To generate the cover graph, please follow this command: 
+- To extract the concept information from the dataset, please follow this command: 
 
-      $ python main_graph.py -concept [path of the concept dictionary] -course [path of the course data] -option cover
+      $ python main_extraction.py -concept [path of the concept dictionary] -course [path of the course data] -p 5 
 
-- To generate the order graph, please follow this command: 
+After running this command, we will see three files, named 'matching_title...', 'matching_section...', 'matching_each_section...', in the main folder. 
 
-      $ python main_graph.py -concept [path of the concept dictionary] -course [path of the course data] -option order
+- To generate the cover network, please follow this command: 
+
+      $ python main_graph.py -title [path of matching information of course title extracted by the main_extraction.py] -section [path of matching information of course section extracted by the main_extraction.py] -option cover
       
 - To generate the tree concept graph, please follow this command:
 
