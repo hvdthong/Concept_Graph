@@ -1,7 +1,7 @@
 # Construct a Concept Graph for a Course Dataset
 
 ## Introduction
-The code in this project is used to generate the concept graph for a course dataset (i.e., udemy). There are two types of concept graph: a cover network and order network. 
+The code in this project is used to generate the concept graph for a course dataset (i.e., udemy). There are two types of concept graphs: cover network and order network. 
 
 #### Cover Network
 - A cover network <img src="https://render.githubusercontent.com/render/math?math=\mathcal{G}^c"> consists of concept nodes <img src="https://render.githubusercontent.com/render/math?math=\mathcal{P}"> and cover edges <img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}^c \in \mathcal{P} \times \mathcal{P}">.
@@ -22,8 +22,14 @@ Please install the neccessary libraries before running our tool:
 - python
 - tqdm
 
-## Hyperparameters (main.graph):
+## Hyperparameters:
 
+#### main_extraction.py
+* -concept: Directory of the list of concepts.
+* -course: Directory of the list of courses.
+* -p: Number of threads to speed up the pre processing data (default: 2).
+
+#### main_graph.py
 * -threshold: Threshold to construct the net graph for the cover and order graph (default: 0.1). 
 
 ## Running
