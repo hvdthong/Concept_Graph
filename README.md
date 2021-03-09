@@ -1,5 +1,8 @@
 # Construct a Concept Graph for a Course Dataset
 
+## Introduction
+<img src="https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1">
+
 ## Implementation Environment
 
 Please install the neccessary libraries before running our tool:
