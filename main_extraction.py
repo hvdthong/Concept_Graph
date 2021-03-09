@@ -13,7 +13,7 @@ def read_args():
     # Construct the cover or order graph
     parser.add_argument('-concept', type=str, help='Directory of the list of concepts')    
     parser.add_argument('-course', type=str, help='Directory of the list of courses')    
-    parser.add_argument('-p', type=int, default=2, help='Number of processors to speed up the pre processing data')    
+    parser.add_argument('-p', type=int, default=2, help='Number of threads to speed up the pre processing data')    
     return parser
 
 if __name__ == '__main__':
