@@ -12,6 +12,8 @@
 
 - An order link <img src="https://render.githubusercontent.com/render/math?math=p_a \rightarrow p_b \in \mathcal{L}^o"> if <img src="https://render.githubusercontent.com/render/math?math=p_a \in s_{i,j}"> and <img src="https://render.githubusercontent.com/render/math?math=p_b \in s_{i,j'}"> for some course <img src="https://render.githubusercontent.com/render/math?math=C_i">, section <img src="https://render.githubusercontent.com/render/math?math=s_{i,j}">, and section <img src="https://render.githubusercontent.com/render/math?math=s_{i,j'}"> such that <img src="https://render.githubusercontent.com/render/math?math=j < j'">.
 
+Details about the order and cover network can be found [here](https://www.overleaf.com/project/5f98ffbd8a6f330001b63ac8)
+
 ## Implementation Environment
 
 Please install the neccessary libraries before running our tool:
