@@ -2,8 +2,10 @@
 
 ## Introduction
 
-##### Cover Network
-A cover network <img src="https://render.githubusercontent.com/render/math?math=\mathcal{G}^c"> consists of concept nodes <img src="https://render.githubusercontent.com/render/math?math=\mathcal{P}"> and cover edges <img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}^c \in \mathcal{P} \times \mathcal{P}">.
+#### Cover Network
+- A cover network <img src="https://render.githubusercontent.com/render/math?math=\mathcal{G}^c"> consists of concept nodes <img src="https://render.githubusercontent.com/render/math?math=\mathcal{P}"> and cover edges <img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}^c \in \mathcal{P} \times \mathcal{P}">.
+
+- A cover link <img src="https://render.githubusercontent.com/render/math?math=p_a > p_b \in \mathcal{L}^c"> if <img src="https://render.githubusercontent.com/render/math?math=p_a \in T_i"> and <img src="https://render.githubusercontent.com/render/math?math=p_b \in s_{i,j}"> for some course <img src="https://render.githubusercontent.com/render/math?math=C_i"> and section <img src="https://render.githubusercontent.com/render/math?math=s_{i,j}">.
 
 ## Implementation Environment
 
