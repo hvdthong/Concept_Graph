@@ -5,7 +5,12 @@
 #### Cover Network
 - A cover network <img src="https://render.githubusercontent.com/render/math?math=\mathcal{G}^c"> consists of concept nodes <img src="https://render.githubusercontent.com/render/math?math=\mathcal{P}"> and cover edges <img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}^c \in \mathcal{P} \times \mathcal{P}">.
 
-- A cover link <img src="https://render.githubusercontent.com/render/math?math=p_a > p_b \in \mathcal{L}^c"> if <img src="https://render.githubusercontent.com/render/math?math=p_a \in T_i"> and <img src="https://render.githubusercontent.com/render/math?math=p_b \in s_{i,j}"> for some course <img src="https://render.githubusercontent.com/render/math?math=C_i"> and section <img src="https://render.githubusercontent.com/render/math?math=s_{i,j}">.
+- A cover edge <img src="https://render.githubusercontent.com/render/math?math=p_a > p_b \in \mathcal{L}^c"> if <img src="https://render.githubusercontent.com/render/math?math=p_a \in T_i"> and <img src="https://render.githubusercontent.com/render/math?math=p_b \in s_{i,j}"> for some course <img src="https://render.githubusercontent.com/render/math?math=C_i"> and section <img src="https://render.githubusercontent.com/render/math?math=s_{i,j}">.
+
+#### Order Network
+- An order network <img src="https://render.githubusercontent.com/render/math?math=\mathcal{G}^o"> consists of concept nodes <img src="https://render.githubusercontent.com/render/math?math=\mathcal{P}"> and cover edges <img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}^o \in \mathcal{P} \times \mathcal{P}">.
+
+- An order link <img src="https://render.githubusercontent.com/render/math?math=p_a \rightarrow p_b \in \mathcal{L}^o"> if <img src="https://render.githubusercontent.com/render/math?math=p_a \in s_{i,j}"> and <img src="https://render.githubusercontent.com/render/math?math=p_b \in s_{i,j'}"> for some course <img src="https://render.githubusercontent.com/render/math?math=C_i">, section <img src="https://render.githubusercontent.com/render/math?math=s_{i,j}">, and section <img src="https://render.githubusercontent.com/render/math?math=s_{i,j'}"> such that <img src="https://render.githubusercontent.com/render/math?math=j < j'">.
 
 ## Implementation Environment
 
